@@ -74,9 +74,11 @@ function bip39encode($dict, $len, $rand = null) {
 		$generated = true;
 	} else {
 		$checksummed = addChecksum(substr($rand, 0, -1));
-		if ($rand !== $checksummed) {
-			throw new Exception('Checksum doesn\'t match, should end in ' . bin2hex(substr($checksummed, -1, 1)));
-		}
+		if ($rand !== $checksummed)
+			throw new Exception(
+				'Checksum doesn\'t match, should end in ' . bin2hex(substr($checksummed, -1, 1)) .
+				', got ' . bin2hex(substr($rand, -1, 1))
+			);
 		$bytes = $len;
 		$len = floor(($bytes * 8) / $index_bits);
 	}
@@ -109,8 +111,10 @@ function decode($str, $dict) {
 	$rest = 0;
 	for ($i = 0; $i < count($words); $i++) {
 		$found = array_search($words[$i], $dict);
-		if ($found === false)
+		if ($found === false) {
+			//echo "Word not found: $words[$i]\n";
 			return false;
+		}
 
 		//if ($index_bits == 11) var_dump($words[$i], $found);
 
@@ -170,7 +174,10 @@ function bip39decode($str, $dict) {
 		return false;
 	$checksummed = addChecksum(substr($binary, 0, -1));
 	if ($binary !== $checksummed) {
-		throw new Exception('Checksum doesn\'t match, should end in ' . bin2hex(substr($checksummed, -1, 1)));
+		throw new Exception(
+			'Checksum doesn\'t match, should end in ' . bin2hex(substr($checksummed, -1, 1)) .
+			', got ' . bin2hex(substr($binary, -1, 1))
+		);
 	}
 	return $binary;
 }
