@@ -1,5 +1,7 @@
 <?php
 
+require('lib.php');
+
 // works for all values 128-256
 function addChecksum($data) {
 	$bits = strlen($data) / 4;
@@ -32,6 +34,10 @@ function encode($dict, $len, $rand = null) {
 	}
 
 	$words = [];
+	/*
+	for ($i = 0; $i < $len; $i++)
+		$words[] = $dict[getbits($rand, $i*$index_bits, $index_bits)];
+	//*/
 	$index = 0;
 	$consumed = 0;
 	for ($i = 0; $i < $bytes; $i++) {
@@ -147,20 +153,6 @@ function decode($str, $dict) {
 				$j = 0;
 			}
 		}
-		/*
-		for ($j = $bytes - 1; $j >= 0; $j--) {
-			$out .= chr($found >> ((8 * $j) + $bits));
-		}
-		if ($bits) {
-			if ($rest === null)
-				$rest = 0;
-			if ($pos + $bits < 8) {
-				$rest += ($found & (255 >> (8 - $bits))) << ((8 - $pos) - $bits);
-				$pos += $bits;
-			} else {
-			}
-		}
-		 */
 	}
 	if ($pos)
 		$out .= chr($rest);

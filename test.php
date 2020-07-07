@@ -3,6 +3,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL | E_STRICT);
 require('bip39.php');
+require_once('lib.php');
 
 function mustEqual($a, $b, $exp = '') {
 	if ($a !== $b) {
@@ -18,6 +19,20 @@ function mustThrow($a, $exp = '') {
 	}
 	echo ($exp ? $exp . ': ' : '') . var_export($a, true) . " did not throw an exception\n";
 }
+
+// lib
+
+mustEqual(getbits(hex2bin('00'), 0, 1), 0x00, '0');
+mustEqual(getbits(hex2bin('ff'), 0, 1), 0x01, '1 from ff');
+mustEqual(getbits(hex2bin('55'), 0, 3), 0x02, '3 at 0 from 55');
+mustEqual(getbits(hex2bin('55'), 1, 3), 0x05, '3 at 1 from 55');
+mustEqual(getbits(hex2bin('5555'), 6, 3), 0x02, '3 at 7 from 5555');
+mustEqual(getbits(hex2bin('5555'), 7, 3), 0x05, '3 at 6 from 5555');
+mustEqual(getbits(hex2bin('5555'), 8, 3), 0x02, '3 at 8 from 5555');
+mustEqual(getbits(hex2bin('555555'), 6, 9), 0x0AA, '9 at 6 from 555555');
+mustEqual(getbits(hex2bin('555555'), 7, 9), 0x155, '9 at 6 from 555555');
+mustThrow(fn() => getbits(hex2bin('00'), 8, 1), 'not enough string');
+mustThrow(fn() => getbits(hex2bin('00'), 7, 2), 'not enough string');
 
 $base8 = array_map(fn($x) => strval($x), range(0, 255));
 $base11 = array_map(fn($x) => strval($x), range(0, 2047));
