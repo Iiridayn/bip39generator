@@ -1,6 +1,6 @@
 <?php
 
-require('lib.php');
+require(__DIR__ . '/lib.php');
 
 // works for all values 128-256
 function addChecksum($data) {

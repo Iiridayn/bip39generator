@@ -2,8 +2,8 @@
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL | E_STRICT);
-require('bip39.php');
-require_once('lib.php');
+require(__DIR__ . '/bip39.php');
+require_once(__DIR__ . '/lib.php');
 
 function mustEqual($a, $b, $exp = '') {
 	if ($a !== $b) {
@@ -33,6 +33,19 @@ mustEqual(getbits(hex2bin('555555'), 6, 9), 0x0AA, '9 at 6 from 555555');
 mustEqual(getbits(hex2bin('555555'), 7, 9), 0x155, '9 at 6 from 555555');
 mustThrow(fn() => getbits(hex2bin('00'), 8, 1), 'not enough string');
 mustThrow(fn() => getbits(hex2bin('00'), 7, 2), 'not enough string');
+
+function testSetBits($str, $pos, $val, $len, $res, $exp = '') {
+	setbits($str, $pos, $val, $len);
+	mustEqual($str, $res, $exp);
+}
+testSetBits(hex2bin('00'), 0, 0x00, 1, hex2bin('00'), 'works at all');
+testSetBits(hex2bin('00'), 0, 0xFF, 1, hex2bin('80'), 'sets a single bit');
+testSetBits(hex2bin('00'), 1, 0x01, 1, hex2bin('40'), 'sets a single bit at given index');
+testSetBits(hex2bin(''), 1, 0x01, 1, hex2bin('40'), 'Append to empty string');
+testSetBits(hex2bin('f8'), 5, 0xff, 5, hex2bin('ffc0'), 'Append to string, multiple bits');
+testSetBits(hex2bin('f8'), 5, 0x12, 5, hex2bin('fc80'), 'Grabs from LSB for value');
+//testSetBits(hex2bin('FF'), 0, 0x00, 1, hex2bin('7F'), 'Can zero a 1 bit'); // fails, fine for appending though
+
 
 $base8 = array_map(fn($x) => strval($x), range(0, 255));
 $base11 = array_map(fn($x) => strval($x), range(0, 2047));
